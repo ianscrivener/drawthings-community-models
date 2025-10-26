@@ -12,4 +12,5 @@ jobs:
     - uses: actions/setup-node@v6
       with: 
         node-version: 24
-    - run: npm -g install @duckdb/node-api dotenv lodash
+    - run: cd _drawthings_companion
+    - run: npm install
