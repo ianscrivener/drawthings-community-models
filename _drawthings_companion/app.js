@@ -17,7 +17,7 @@ async function main() {
         // console.log('Creating DuckDB instance...');
         // // 1. create an in memory DuckDB database
         // const instance = await DuckDBInstance.create(':memory:');
-        const instance = await DuckDBInstance.create('ckpt.duckdb:');
+        const instance = await DuckDBInstance.create('ckpt.duckdb');
         const connection = await instance.connect();
 
         // create db
@@ -50,6 +50,12 @@ async function main() {
             const sub_dirs = fs.readdirSync(dirPath);
             for (const dir of sub_dirs) {
 
+                // skip .DS_Store or any non-directory files
+                const fullDirPath = `${dirPath}/${dir}`;
+                if (!fs.lstatSync(fullDirPath).isDirectory()) {
+                    continue;
+                }
+
                 // increment counter
                 counter += 1;
 
@@ -81,16 +87,23 @@ async function main() {
             COPY ckpt TO 'ckpt.duckdb.parquet' (FORMAT PARQUET);
         `);
 
-        // get file size of parquet file
-        const stats = fs.statSync('ckpt.duckdb.parquet');
-        const fileSizeInBytes = stats.size;
-        const fileSizeInMB = (fileSizeInBytes / (1024)).toFixed(2);
-        console.log(`Parquet file size: ${fileSizeInMB} kilobytes`);
-
         // close connection
         await connection.closeSync();
         console.log('Close DuckDB Connection.');
 
+        // get file size of DuckDB file
+        let stats = fs.statSync('ckpt.duckdb');
+        let fileSizeInBytes = stats.size;
+        let fileSizeInMB = (fileSizeInBytes / (1024*1024)).toFixed(2);
+        console.log(`DuckDB file size: ${fileSizeInMB} megabytes`);
+
+        // get file size of parquet file
+        stats = fs.statSync('ckpt.duckdb.parquet');
+        fileSizeInBytes = stats.size;
+        fileSizeInMB = (fileSizeInBytes / (1024)).toFixed(2);
+        console.log(`Parquet file size: ${fileSizeInMB} kilobytes`);
+
+     
     }
     
     catch (error) { 
