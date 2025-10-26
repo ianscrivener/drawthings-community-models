@@ -1,13 +1,21 @@
-name: drawthings-companionon:
-on: 
-  workflow_dispatch:
+name: Main Branch CI
+
+on:
+  push:
+    branches: [ main ]
+
 jobs:
-  setup:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - run: npm install -g @duckdb/node-api dotenv lodash
-      - run: bats -v
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install DuckDB Node.js API
+      run: npm install @duckdb/node-api dotenv lodash
